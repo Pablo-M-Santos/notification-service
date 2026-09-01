@@ -6,6 +6,12 @@
       <env name="DB_PASSWORD" value="ISsvUVehFNgqlW84" />
       <env name="DB_PORT" value="6543" />
       <env name="DB_USERNAME" value="postgres.uzeffsxydhtxseortbly" />
+      <env name="NOTIFICATION_MAX_RETRIES" value="3" />
+      <env name="NOTIFICATION_RETRY_INITIAL_DELAY" value="2000" />
+      <env name="RABBITMQ_HOST" value="localhost" />
+      <env name="RABBITMQ_PASSWORD" value="admin" />
+      <env name="RABBITMQ_PORT" value="5672" />
+      <env name="RABBITMQ_USERNAME" value="admin" />
       <env name="TELEGRAM_BOT_TOKEN" value="8897953631:AAGcUuQ89BACOiflgY5xyn_wsrxURS2EgCs" />
       <env name="TELEGRAM_CHAT_ID" value="5638426851" />
     </envs>
