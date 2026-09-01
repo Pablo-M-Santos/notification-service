@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Notification" type="Application" factoryName="Application">
+    <envs>
+      <env name="DB_HOST" value="aws-0-us-west-2.pooler.supabase.com" />
+      <env name="DB_NAME" value="postgres" />
+      <env name="DB_PASSWORD" value="ISsvUVehFNgqlW84" />
+      <env name="DB_PORT" value="6543" />
+      <env name="DB_USERNAME" value="postgres.uzeffsxydhtxseortbly" />
+      <env name="TELEGRAM_BOT_TOKEN" value="8897953631:AAGcUuQ89BACOiflgY5xyn_wsrxURS2EgCs" />
+      <env name="TELEGRAM_CHAT_ID" value="5638426851" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.pablo.notification.NotificationServiceApplication" />
+    <module name="notification-service" />
+    <option name="PASS_PARENT_ENVS" value="false" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
