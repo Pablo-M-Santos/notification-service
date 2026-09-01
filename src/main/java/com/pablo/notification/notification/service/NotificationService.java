@@ -5,6 +5,7 @@ import com.pablo.notification.notification.dto.NotificationRequest;
 import com.pablo.notification.notification.dto.NotificationResponse;
 import com.pablo.notification.notification.entity.Notification;
 import com.pablo.notification.notification.exception.NotificationNotFoundException;
+import com.pablo.notification.notification.messaging.NotificationProducer;
 import com.pablo.notification.notification.provider.NotificationProviderFactory;
 import com.pablo.notification.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationProcessor notificationProcessor;
+    private final NotificationProducer notificationProducer;
     private final NotificationProviderFactory providerFactory;
 
     public NotificationResponse send(NotificationRequest request) {
@@ -34,7 +36,7 @@ public class NotificationService {
 
         notificationRepository.save(notification);
 
-        notificationProcessor.process(notification.getId());
+        notificationProducer.send(notification.getId());
 
         return toResponse(notification);
     }
