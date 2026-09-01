@@ -2,7 +2,6 @@ package com.pablo.notification.notification.service;
 
 import com.pablo.notification.notification.config.RetryProperties;
 import com.pablo.notification.notification.domain.NotificationStatus;
-import com.pablo.notification.notification.dto.NotificationRequest;
 import com.pablo.notification.notification.entity.Notification;
 import com.pablo.notification.notification.entity.NotificationAttempt;
 import com.pablo.notification.notification.provider.NotificationProvider;
@@ -19,19 +18,24 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class NotificationProcessor {
 
-    private final NotificationProviderFactory providerFactory;
     private final NotificationRepository notificationRepository;
     private final NotificationAttemptRepository notificationAttemptRepository;
+    private final NotificationProviderFactory providerFactory;
     private final RetryProperties retryProperties;
 
     @Async("notificationExecutor")
-    public void process(
-            Notification notification,
-            NotificationRequest request
-    ) {
+    public void process(Long notificationId) {
+
+        Notification notification =
+                notificationRepository.findById(notificationId)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Notification não encontrada: " + notificationId
+                                )
+                        );
 
         NotificationProvider provider =
-                providerFactory.getProvider(request.channel());
+                providerFactory.getProvider(notification.getChannel());
 
         for (int attemptNumber = 1;
              attemptNumber <= retryProperties.maxAttempts();
@@ -45,7 +49,7 @@ public class NotificationProcessor {
 
             try {
 
-                provider.send(request);
+                provider.send(notification);
 
                 attempt.setStatus(NotificationStatus.SENT);
 

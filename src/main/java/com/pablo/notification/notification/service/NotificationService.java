@@ -28,6 +28,6 @@ public class NotificationService {
 
         notificationRepository.save(notification);
 
-        notificationProcessor.process(notification, request);
+        notificationProcessor.process(notification.getId());
     }
 }
