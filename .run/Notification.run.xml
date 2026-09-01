@@ -7,7 +7,7 @@
       <env name="DB_PORT" value="6543" />
       <env name="DB_USERNAME" value="postgres.uzeffsxydhtxseortbly" />
       <env name="TELEGRAM_BOT_TOKEN" value="8897953631:AAGcUuQ89BACOiflgY5xyn_wsrxURS2EgCs" />
-      <env name="TELEGRAM_CHAT_ID" value="5638426851" />
+      <env name="TELEGRAM_CHAT_ID" value="5638426852" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.pablo.notification.NotificationServiceApplication" />
     <module name="notification-service" />
