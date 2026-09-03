@@ -23,7 +23,7 @@ public class NotificationProcessor {
     private final NotificationProviderFactory providerFactory;
     private final RetryProperties retryProperties;
 
-    @Async("notificationExecutor")
+
     public void process(Long notificationId) {
 
         Notification notification =
