@@ -4,9 +4,6 @@ import com.pablo.notification.notification.config.RabbitMQConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
-/**
- * Produtor responsável por enviar mensagens de notificação para o RabbitMQ.
- */
 @Component
 public class NotificationProducer {
 
@@ -16,11 +13,6 @@ public class NotificationProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    /**
-     * Envia uma nova notificação para a fila principal com tentativa inicial 1.
-     *
-     * @param notificationId identificador único da notificação
-     */
     public void send(Long notificationId) {
 
         NotificationMessage message = new NotificationMessage(

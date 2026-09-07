@@ -8,16 +8,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
-/**
- * Consumidor de mensagens de notificação.
- * Realiza o processamento com acknowledge manual e estratégia de retry com DLQ.
- */
 @Component
 public class NotificationConsumer {
 
-    /**
-     * Número máximo de tentativas antes de enviar para a DLQ.
-     */
     private static final int MAX_ATTEMPTS = 3;
 
     private final NotificationProcessor notificationProcessor;
@@ -48,34 +41,46 @@ public class NotificationConsumer {
                     message.attempt()
             );
 
-            channel.basicAck(deliveryTag, false);
-
         } catch (Exception exception) {
 
-            if (message.attempt() >= MAX_ATTEMPTS) {
+            handleFailure(message);
 
-                rabbitTemplate.convertAndSend(
-                        RabbitMQConfig.NOTIFICATION_DLQ_EXCHANGE,
-                        RabbitMQConfig.NOTIFICATION_DLQ_ROUTING_KEY,
-                        message
-                );
-
-            } else {
-
-                NotificationMessage retryMessage =
-                        new NotificationMessage(
-                                message.notificationId(),
-                                message.attempt() + 1
-                        );
-
-                rabbitTemplate.convertAndSend(
-                        RabbitMQConfig.NOTIFICATION_RETRY_EXCHANGE,
-                        RabbitMQConfig.NOTIFICATION_RETRY_ROUTING_KEY,
-                        retryMessage
-                );
-            }
+        } finally {
 
             channel.basicAck(deliveryTag, false);
         }
+    }
+
+    private void handleFailure(NotificationMessage message) {
+
+        if (message.attempt() >= MAX_ATTEMPTS) {
+            sendToDlq(message);
+            return;
+        }
+
+        sendToRetry(message);
+    }
+
+    private void sendToRetry(NotificationMessage message) {
+
+        NotificationMessage retryMessage = new NotificationMessage(
+                message.notificationId(),
+                message.attempt() + 1
+        );
+
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.NOTIFICATION_RETRY_EXCHANGE,
+                RabbitMQConfig.NOTIFICATION_RETRY_ROUTING_KEY,
+                retryMessage
+        );
+    }
+
+    private void sendToDlq(NotificationMessage message) {
+
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.NOTIFICATION_DLQ_EXCHANGE,
+                RabbitMQConfig.NOTIFICATION_DLQ_ROUTING_KEY,
+                message
+        );
     }
 }
