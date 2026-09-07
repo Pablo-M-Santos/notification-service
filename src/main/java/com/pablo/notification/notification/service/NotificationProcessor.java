@@ -9,13 +9,10 @@ import com.pablo.notification.notification.repository.NotificationAttemptReposit
 import com.pablo.notification.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-/**
- * Serviço responsável pelo processamento de notificações.
- * Coordena o envio através do provider, registro de tentativas e atualização de status.
- */
 @Service
 @RequiredArgsConstructor
 public class NotificationProcessor {
@@ -24,57 +21,87 @@ public class NotificationProcessor {
     private final NotificationAttemptRepository notificationAttemptRepository;
     private final NotificationProviderFactory providerFactory;
 
-    /**
-     * Processa o envio de uma notificação.
-     *
-     * @param notificationId identificador da notificação
-     * @param attemptNumber  número da tentativa atual
-     * @throws IllegalArgumentException se a notificação não for encontrada
-     */
+    @Transactional
     public void process(Long notificationId, int attemptNumber) {
 
-        Notification notification =
-                notificationRepository.findById(notificationId)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Notification não encontrada: " + notificationId
-                                )
-                        );
+        Notification notification = findNotification(notificationId);
 
         NotificationProvider provider =
                 providerFactory.getProvider(notification.getChannel());
 
-        NotificationAttempt attempt = NotificationAttempt.builder()
-                .notification(notification)
-                .attemptNumber(attemptNumber)
-                .attemptedAt(LocalDateTime.now())
-                .build();
+        NotificationAttempt attempt = createAttempt(
+                notification,
+                attemptNumber
+        );
 
         try {
 
             provider.send(notification);
 
-            attempt.setStatus(NotificationStatus.SENT);
-
-            notification.setStatus(NotificationStatus.SENT);
-            notification.setSentAt(LocalDateTime.now());
-
-            notificationAttemptRepository.save(attempt);
-            notificationRepository.save(notification);
+            markAsSent(notification, attempt);
 
         } catch (Exception exception) {
 
-            attempt.setStatus(NotificationStatus.FAILED);
-            attempt.setErrorMessage(exception.getMessage());
-
-            notificationAttemptRepository.save(attempt);
-
-            notification.setStatus(NotificationStatus.FAILED);
-            notification.setErrorMessage(exception.getMessage());
-
-            notificationRepository.save(notification);
+            markAsFailed(notification, attempt, exception);
 
             throw exception;
         }
+    }
+
+    private Notification findNotification(Long notificationId) {
+
+        return notificationRepository.findById(notificationId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Notification não encontrada: " + notificationId
+                        )
+                );
+    }
+
+    private NotificationAttempt createAttempt(
+            Notification notification,
+            int attemptNumber
+    ) {
+
+        return NotificationAttempt.builder()
+                .notification(notification)
+                .attemptNumber(attemptNumber)
+                .attemptedAt(LocalDateTime.now())
+                .build();
+    }
+
+    private void markAsSent(
+            Notification notification,
+            NotificationAttempt attempt
+    ) {
+
+        LocalDateTime sentAt = LocalDateTime.now();
+
+        attempt.setStatus(NotificationStatus.SENT);
+
+        notification.setStatus(NotificationStatus.SENT);
+        notification.setSentAt(sentAt);
+        notification.setErrorMessage(null);
+
+        notificationAttemptRepository.save(attempt);
+        notificationRepository.save(notification);
+    }
+
+    private void markAsFailed(
+            Notification notification,
+            NotificationAttempt attempt,
+            Exception exception
+    ) {
+
+        String errorMessage = exception.getMessage();
+
+        attempt.setStatus(NotificationStatus.FAILED);
+        attempt.setErrorMessage(errorMessage);
+
+        notification.setStatus(NotificationStatus.FAILED);
+        notification.setErrorMessage(errorMessage);
+
+        notificationAttemptRepository.save(attempt);
+        notificationRepository.save(notification);
     }
 }
