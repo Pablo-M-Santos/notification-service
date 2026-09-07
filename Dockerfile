@@ -3,18 +3,26 @@ FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 COPY pom.xml .
-
 COPY src ./src
 
 RUN mvn clean package -DskipTests
 
 
-FROM eclipse-temurin:21-jre
+FROM rabbitmq:4-management
+
+USER root
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openjdk-21-jre-headless \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 8080
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+EXPOSE 8080 5672 15672
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

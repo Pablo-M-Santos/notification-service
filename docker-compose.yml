@@ -3,8 +3,10 @@ services:
   app:
     build: .
     container_name: notification-service
+
     ports:
       - "8080:8080"
+      - "15672:15672"
 
     environment:
       DB_HOST: ${DB_HOST}
@@ -16,28 +18,7 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
 
-      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_HOST: localhost
       RABBITMQ_PORT: 5672
       RABBITMQ_USERNAME: admin
       RABBITMQ_PASSWORD: admin
-
-    depends_on:
-      - rabbitmq
-
-  rabbitmq:
-    image: rabbitmq:4-management
-    container_name: notification-rabbitmq
-
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-
-    environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
-
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-
-volumes:
-  rabbitmq_data:
