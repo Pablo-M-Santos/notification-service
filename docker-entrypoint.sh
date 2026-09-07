@@ -16,6 +16,13 @@ done
 
 echo "RabbitMQ iniciado com sucesso!"
 
+rabbitmqctl delete_user admin 2>/dev/null || true
+rabbitmqctl add_user admin admin
+rabbitmqctl set_user_tags admin administrator
+rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
+
+echo "Usuário RabbitMQ configurado!"
+
 echo "========================================"
 echo "Iniciando Spring Boot..."
 echo "========================================"
