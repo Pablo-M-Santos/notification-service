@@ -23,7 +23,7 @@ public class NotificationAttempt {
     @JoinColumn(name = "notification_id", nullable = false)
     private Notification notification;
 
-    @Column(nullable = false)
+    @Column(name = "attempt_number", nullable = false)
     private Integer attemptNumber;
 
     @Enumerated(EnumType.STRING)
@@ -36,4 +36,3 @@ public class NotificationAttempt {
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 }
-

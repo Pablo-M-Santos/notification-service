@@ -1,4 +1,3 @@
-
 package com.pablo.notification.notification.entity;
 
 import com.pablo.notification.notification.domain.NotificationChannel;
@@ -20,6 +19,10 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -44,4 +47,3 @@ public class Notification {
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
 }
-
