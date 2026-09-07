@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 public record NotificationResponse(
         Long id,
+        String externalId,
         String title,
         String message,
         NotificationChannel channel,

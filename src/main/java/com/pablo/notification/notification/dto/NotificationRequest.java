@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotNull;
 
 public record NotificationRequest(
 
+        @NotBlank(message = "External ID é obrigatório")
+        String externalId,
+
         @NotBlank(message = "Título é obrigatório")
         String title,
 
