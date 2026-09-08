@@ -17,12 +17,21 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(allowedOrigins)
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                        .allowedHeaders("*")
-                        .allowCredentials(true)
-                        .maxAge(3600);
+                if (allowedOrigins.length == 1 && "*".equals(allowedOrigins[0])) {
+                    registry.addMapping("/**")
+                            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                            .allowedHeaders("*")
+                            .allowedOriginPatterns("*")
+                            .allowCredentials(true)
+                            .maxAge(3600);
+                } else {
+                    registry.addMapping("/**")
+                            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                            .allowedHeaders("*")
+                            .allowedOrigins(allowedOrigins)
+                            .allowCredentials(true)
+                            .maxAge(3600);
+                }
             }
         };
     }
