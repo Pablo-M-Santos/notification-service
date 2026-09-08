@@ -20,10 +20,10 @@ WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-COPY rabbitmq.conf /etc/rabbitmq/rabbitmq.conf
+
 
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 10000
+EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
