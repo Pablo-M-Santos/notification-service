@@ -13,6 +13,7 @@ public record NotificationResponse(
         NotificationChannel channel,
         NotificationStatus status,
         LocalDateTime createdAt,
+        LocalDateTime scheduledAt,
         LocalDateTime sentAt
 ) {
 }

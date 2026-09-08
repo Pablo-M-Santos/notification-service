@@ -4,6 +4,8 @@ import com.pablo.notification.notification.domain.NotificationChannel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
+
 public record NotificationRequest(
 
         @NotBlank(message = "External ID é obrigatório")
@@ -16,6 +18,8 @@ public record NotificationRequest(
         String message,
 
         @NotNull(message = "Canal é obrigatório")
-        NotificationChannel channel
+        NotificationChannel channel,
+
+        LocalDateTime scheduledAt
 ) {
 }

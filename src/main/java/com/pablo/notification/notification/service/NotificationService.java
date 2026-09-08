@@ -35,18 +35,30 @@ public class NotificationService {
 
         User user = findOrCreateUser(request.externalId());
 
+        LocalDateTime now = LocalDateTime.now();
+
+        NotificationStatus status = NotificationStatus.PENDING;
+        LocalDateTime scheduledAt = request.scheduledAt();
+
+        if (scheduledAt != null && scheduledAt.isAfter(now)) {
+            status = NotificationStatus.SCHEDULED;
+        }
+
         Notification notification = Notification.builder()
                 .user(user)
                 .title(request.title())
                 .message(request.message())
                 .channel(request.channel())
-                .status(NotificationStatus.PENDING)
-                .createdAt(LocalDateTime.now())
+                .status(status)
+                .createdAt(now)
+                .scheduledAt(scheduledAt)
                 .build();
 
         notificationRepository.save(notification);
 
-        notificationProducer.send(notification.getId());
+        if (status == NotificationStatus.PENDING) {
+            notificationProducer.send(notification.getId());
+        }
 
         return toResponse(notification);
     }
@@ -103,6 +115,7 @@ public class NotificationService {
                 notification.getChannel(),
                 notification.getStatus(),
                 notification.getCreatedAt(),
+                notification.getScheduledAt(),
                 notification.getSentAt()
         );
     }

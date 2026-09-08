@@ -14,4 +14,9 @@ public interface NotificationRepository
 
     @Query("SELECT n FROM Notification n WHERE n.user.id = :userId")
     List<Notification> findByUserId(@Param("userId") Long userId);
+
+    @Query(value = "SELECT n.* FROM notifications n " +
+            "WHERE n.status = 'SCHEDULED' AND n.scheduled_at <= CURRENT_TIMESTAMP",
+            nativeQuery = true)
+    List<Notification> findScheduledNotificationsReadyToSend();
 }
