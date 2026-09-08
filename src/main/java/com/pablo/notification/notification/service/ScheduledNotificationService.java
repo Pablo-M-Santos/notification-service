@@ -5,7 +5,6 @@ import com.pablo.notification.notification.entity.Notification;
 import com.pablo.notification.notification.messaging.NotificationProducer;
 import com.pablo.notification.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +14,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ScheduledNotificationService {
 
     private final NotificationRepository notificationRepository;
@@ -32,12 +30,8 @@ public class ScheduledNotificationService {
             return;
         }
 
-        log.info("Processando {} notificações agendadas.", scheduled.size());
-
         for (Notification notification : scheduled) {
             if (notification.getScheduledAt() != null && notification.getScheduledAt().isAfter(now)) {
-                log.warn("Notificação {} agendada para {} mas o horário atual é {}. Pulando envio antecipado.",
-                        notification.getId(), notification.getScheduledAt(), now);
                 continue;
             }
 
@@ -45,8 +39,6 @@ public class ScheduledNotificationService {
             notificationRepository.save(notification);
 
             notificationProducer.send(notification.getId());
-
-            log.info("Notificação agendada enviada para processamento: id={}", notification.getId());
         }
     }
 }
