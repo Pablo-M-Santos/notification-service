@@ -6,6 +6,7 @@ import com.pablo.notification.notification.dto.NotificationResponse;
 import com.pablo.notification.notification.entity.Notification;
 import com.pablo.notification.notification.entity.User;
 import com.pablo.notification.notification.exception.NotificationNotFoundException;
+import com.pablo.notification.notification.exception.UserNotFoundException;
 import com.pablo.notification.notification.messaging.NotificationProducer;
 import com.pablo.notification.notification.provider.NotificationProviderFactory;
 import com.pablo.notification.notification.repository.NotificationRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -79,6 +81,16 @@ public class NotificationService {
                 .orElseThrow(() -> new NotificationNotFoundException(id));
 
         return toResponse(notification);
+    }
+
+    public List<NotificationResponse> findByExternalId(String externalId) {
+
+        User user = userRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new UserNotFoundException(externalId));
+
+        return notificationRepository.findByUserId(user.getId()).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     private NotificationResponse toResponse(Notification notification) {
