@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -16,7 +17,7 @@ public interface NotificationRepository
     List<Notification> findByUserId(@Param("userId") Long userId);
 
     @Query(value = "SELECT n.* FROM notifications n " +
-            "WHERE n.status = 'SCHEDULED' AND n.scheduled_at <= CURRENT_TIMESTAMP",
+            "WHERE n.status = 'SCHEDULED' AND n.scheduled_at <= :now",
             nativeQuery = true)
-    List<Notification> findScheduledNotificationsReadyToSend();
+    List<Notification> findScheduledNotificationsReadyToSend(@Param("now") LocalDateTime now);
 }

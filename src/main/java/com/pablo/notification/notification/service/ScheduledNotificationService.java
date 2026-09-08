@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,7 +24,9 @@ public class ScheduledNotificationService {
     @Scheduled(fixedDelay = 30000)
     @Transactional
     public void processScheduledNotifications() {
-        List<Notification> scheduled = notificationRepository.findScheduledNotificationsReadyToSend();
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Notification> scheduled = notificationRepository.findScheduledNotificationsReadyToSend(now);
 
         if (scheduled.isEmpty()) {
             return;
@@ -32,6 +35,12 @@ public class ScheduledNotificationService {
         log.info("Processando {} notificações agendadas.", scheduled.size());
 
         for (Notification notification : scheduled) {
+            if (notification.getScheduledAt() != null && notification.getScheduledAt().isAfter(now)) {
+                log.warn("Notificação {} agendada para {} mas o horário atual é {}. Pulando envio antecipado.",
+                        notification.getId(), notification.getScheduledAt(), now);
+                continue;
+            }
+
             notification.setStatus(NotificationStatus.PENDING);
             notificationRepository.save(notification);
 
